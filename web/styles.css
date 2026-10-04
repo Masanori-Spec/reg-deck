@@ -1310,6 +1310,10 @@ dialog textarea {
     transition: background 0.12s;
   }
 }
+@page {
+  size: A4;
+  margin: 12mm;
+}
 @media print {
   .topbar,
   .hero,
