@@ -1,0 +1,94 @@
+{
+  "schema": "regdeck/v1",
+  "name": "Float32 permutation reference",
+  "fields": [
+    {
+      "id": "float0",
+      "label": "ABCD =12.5",
+      "space": "holding",
+      "address": 0,
+      "convention": "pdu",
+      "type": "float32",
+      "order": "ABCD",
+      "scale": "1",
+      "offset": "0",
+      "unit": "",
+      "note": ""
+    },
+    {
+      "id": "float1",
+      "label": "CDAB =12.5",
+      "space": "holding",
+      "address": 2,
+      "convention": "pdu",
+      "type": "float32",
+      "order": "CDAB",
+      "scale": "1",
+      "offset": "0",
+      "unit": "",
+      "note": ""
+    },
+    {
+      "id": "float2",
+      "label": "BADC =12.5",
+      "space": "holding",
+      "address": 4,
+      "convention": "pdu",
+      "type": "float32",
+      "order": "BADC",
+      "scale": "1",
+      "offset": "0",
+      "unit": "",
+      "note": ""
+    },
+    {
+      "id": "float3",
+      "label": "DCBA =12.5",
+      "space": "holding",
+      "address": 6,
+      "convention": "pdu",
+      "type": "float32",
+      "order": "DCBA",
+      "scale": "1",
+      "offset": "0",
+      "unit": "",
+      "note": ""
+    }
+  ],
+  "cases": [
+    {
+      "id": "permutations",
+      "name": "Independent12.5 reference",
+      "space": "holding",
+      "start": 0,
+      "words": [
+        16712,
+        0,
+        0,
+        16712,
+        18497,
+        0,
+        0,
+        18497
+      ],
+      "expected": {
+        "float0": {
+          "value": "12.5",
+          "tolerance": "0"
+        },
+        "float1": {
+          "value": "12.5",
+          "tolerance": "0"
+        },
+        "float2": {
+          "value": "12.5",
+          "tolerance": "0"
+        },
+        "float3": {
+          "value": "12.5",
+          "tolerance": "0"
+        }
+      }
+    }
+  ]
+}

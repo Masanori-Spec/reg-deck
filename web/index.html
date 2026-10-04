@@ -1,0 +1,510 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#143e35" />
+    <meta
+      name="description"
+      content="RegDeck: a local-only Modbus map-to-regression-fixture workbench. Independent expectations, explicit addressing and portable Python checks."
+    />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'; form-action 'none'"
+    />
+    <title>RegDeck · register contracts</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <a class="skip" href="#main">メインへ / Skip to content</a>
+    <header class="topbar">
+      <a class="brand" href="#main" aria-label="RegDeck home"
+        ><span class="brandmark">r<span>↔</span></span
+        >RegDeck<span class="version">/ 01</span></a
+      >
+      <div class="header-right">
+        <span class="local-indicator" data-t="local">ローカル処理のみ</span
+        ><label class="sr-only" for="language">Language</label
+        ><select id="language">
+          <option value="ja">日本語</option>
+          <option value="en">English</option></select
+        ><a href="#guide" data-t="guideLink">使い方 ↗</a>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">MODBUS / DECODING CONTRACTS</p>
+          <h1 data-t="headline">
+            レジスタの解釈に、<br />確かめられる約束を。
+          </h1>
+          <p class="lede" data-t="lede">
+            マップと記録した生の値を、独立した期待値で照合。アドレスやバイト順の変更を、再実行できる回帰テストに。
+          </p>
+          <div class="hero-actions">
+            <button class="primary" id="load-example" data-t="example">
+              参照サンプルを開く</button
+            ><button class="ghost" id="load-drift" data-t="drift">
+              ずれを見つける ↗
+            </button>
+          </div>
+        </div>
+        <div class="signal-card" aria-hidden="true">
+          <div class="signal-label">RAW WORDS <span>→</span> EXPECTED</div>
+          <div class="signal-flow">
+            <span>FF</span><span>E7</span><i>→</i
+            ><strong>−2.5<span>°C</span></strong>
+          </div>
+          <div class="signal-rule">
+            <span>int16 · × 0.1</span><span>PASS / 01</span>
+          </div>
+          <p data-t="signal">期待値は自動生成しません</p>
+        </div>
+      </section>
+      <aside class="scope-note">
+        <span>i</span>
+        <p data-t="scope">
+          機器には接続しません。通信・書き込み・安全認証は対象外です。実機の仕様書と独立した基準値を使って確認してください。
+        </p>
+      </aside>
+      <section class="workspace">
+        <div class="workspace-heading">
+          <div>
+            <p class="eyebrow" data-t="workspace">
+              WORKSPACE / セッション内のみ
+            </p>
+            <h2 id="project-title"></h2>
+          </div>
+          <div class="workspace-actions">
+            <button id="undo" class="small" data-t="undo">元に戻す</button
+            ><button id="open-import" class="small" data-t="import">
+              インポート</button
+            ><button id="save-project" class="dark" data-t="save">
+              JSONを保存 ↓
+            </button>
+          </div>
+        </div>
+        <div id="status" role="status" aria-live="polite"></div>
+        <div class="summary" id="summary"></div>
+        <div class="tabbar" role="tablist" aria-label="Workspace">
+          <button
+            role="tab"
+            id="tab-map"
+            aria-controls="panel-map"
+            aria-selected="true"
+            data-t="mapTab"
+          >
+            01 マップ</button
+          ><button
+            role="tab"
+            id="tab-cases"
+            aria-controls="panel-cases"
+            aria-selected="false"
+            tabindex="-1"
+            data-t="casesTab"
+          >
+            02 記録と期待値</button
+          ><button
+            role="tab"
+            id="tab-review"
+            aria-controls="panel-review"
+            aria-selected="false"
+            tabindex="-1"
+            data-t="reviewTab"
+          >
+            03 レビュー・出力
+          </button>
+        </div>
+        <section
+          class="panel"
+          id="panel-map"
+          role="tabpanel"
+          aria-labelledby="tab-map"
+        >
+          <div class="map-layout">
+            <div class="map-main">
+              <div class="section-heading">
+                <h3 data-t="mapHeading">解釈のマップ</h3>
+                <button id="add-field" class="small" data-t="addField">
+                  ＋ フィールド
+                </button>
+              </div>
+              <label class="search"
+                ><span data-t="search">フィールドを探す</span
+                ><input
+                  id="search-field"
+                  type="search"
+                  placeholder="ID / label"
+                  maxlength="120"
+              /></label>
+              <div class="table-scroll">
+                <table class="map-table">
+                  <thead>
+                    <tr>
+                      <th data-t="field">フィールド</th>
+                      <th data-t="sourceAddress">元の表記</th>
+                      <th>PDU</th>
+                      <th data-t="interpretation">解釈</th>
+                    </tr>
+                  </thead>
+                  <tbody id="map-rows"></tbody>
+                </table>
+              </div>
+              <div class="map-legend">
+                <span class="dot green"></span
+                ><span data-t="legendScope">Holding / Input は別の空間</span
+                ><span class="dot amber"></span
+                ><span data-t="legendOverlap">重複はレビュー対象</span>
+              </div>
+              <div class="overlap-box">
+                <h4 data-t="overlapHeading">重複の確認</h4>
+                <div id="overlaps"></div>
+              </div>
+            </div>
+            <aside class="inspector">
+              <div class="inspector-head">
+                <p class="eyebrow" data-t="fieldDetail">
+                  FIELD DETAIL / 解釈を編集
+                </p>
+                <span id="field-id"></span>
+              </div>
+              <form id="field-form">
+                <label
+                  ><span data-t="label">表示名</span
+                  ><input name="label" maxlength="240" required
+                /></label>
+                <div class="two">
+                  <label
+                    ><span data-t="space">空間</span
+                    ><select name="space">
+                      <option value="holding">Holding / FC03</option>
+                      <option value="input">Input / FC04</option>
+                    </select></label
+                  ><label
+                    ><span data-t="addressConvention">アドレス表記</span
+                    ><select name="convention">
+                      <option value="pdu">PDU · 0-based</option>
+                      <option value="one">Register · 1-based</option>
+                      <option value="reference">30001 / 40001</option>
+                    </select></label
+                  >
+                </div>
+                <label
+                  ><span data-t="address">元のアドレス</span
+                  ><input name="address" inputmode="numeric" required
+                /></label>
+                <p class="field-hint" data-t="addressHint">
+                  PDU
+                  は通信で使う0始まりのアドレス。表記を変更しても元の数値は自動変換しません。
+                </p>
+                <div class="two">
+                  <label
+                    ><span data-t="type">データ型</span
+                    ><select name="type">
+                      <option>uint16</option>
+                      <option>int16</option>
+                      <option>uint32</option>
+                      <option>int32</option>
+                      <option>float32</option>
+                    </select></label
+                  ><label
+                    ><span data-t="order">入力バイト順</span
+                    ><select name="order"></select
+                  ></label>
+                </div>
+                <div class="byte-diagram" id="byte-diagram"></div>
+                <div class="two">
+                  <label
+                    ><span data-t="scale">倍率</span
+                    ><input
+                      name="scale"
+                      inputmode="decimal"
+                      maxlength="40"
+                      required /></label
+                  ><label
+                    ><span data-t="offset">オフセット</span
+                    ><input
+                      name="offset"
+                      inputmode="decimal"
+                      maxlength="40"
+                      required
+                  /></label>
+                </div>
+                <label
+                  ><span data-t="unit">単位</span
+                  ><input name="unit" maxlength="80" /></label
+                ><label
+                  ><span data-t="note">仕様・別名の根拠</span
+                  ><textarea name="note" rows="3" maxlength="2000"></textarea>
+                </label>
+                <p class="field-hint" data-t="floatHint">
+                  整数: 生の値 × 倍率 + オフセットを10進数で厳密に計算。float32:
+                  倍率1・オフセット0のみ。
+                </p>
+                <div class="form-actions">
+                  <button class="primary" type="submit" data-t="apply">
+                    変更を適用</button
+                  ><button type="button" id="cancel-field" data-t="cancel">
+                    取り消す
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  class="text-button danger"
+                  id="delete-field"
+                  data-t="deleteField"
+                >
+                  フィールドを削除
+                </button>
+              </form>
+              <p id="empty-field" hidden data-t="noFields">
+                フィールドを追加してください
+              </p>
+            </aside>
+          </div>
+        </section>
+        <section
+          class="panel"
+          id="panel-cases"
+          role="tabpanel"
+          aria-labelledby="tab-cases"
+          hidden
+        >
+          <div class="section-heading">
+            <div>
+              <h3 data-t="casesHeading">記録はそのまま。期待値は独立して。</h3>
+              <p class="muted" data-t="casesDescription">
+                期待値をマップから生成しないため、解釈の変更が不一致として残ります。
+              </p>
+            </div>
+            <button id="add-case" class="small" data-t="addCase">
+              ＋ 記録
+            </button>
+          </div>
+          <div class="case-layout">
+            <div class="snapshot">
+              <label
+                ><span data-t="selectCase">記録を選択</span
+                ><select id="case-select"></select
+              ></label>
+              <form id="case-form">
+                <label
+                  ><span data-t="caseName">記録名</span
+                  ><input name="name" maxlength="240" required
+                /></label>
+                <div class="two">
+                  <label
+                    ><span data-t="space">空間</span
+                    ><select name="space">
+                      <option value="holding">Holding / FC03</option>
+                      <option value="input">Input / FC04</option>
+                    </select></label
+                  ><label
+                    ><span data-t="start">開始PDUアドレス</span
+                    ><input name="start" inputmode="numeric" required
+                  /></label>
+                </div>
+                <label
+                  ><span data-t="words">生の16ビットワード (16進数)</span
+                  ><textarea
+                    name="words"
+                    id="snapshot-words"
+                    rows="6"
+                    spellcheck="false"
+                    maxlength="30000"
+                  ></textarea>
+                </label>
+                <p class="field-hint" data-t="wordsHint">
+                  空白またはカンマで区切ります。例: FFE7 0000 4148
+                  0000。各ワードは0000–FFFF、最大4096個。
+                </p>
+                <div class="form-actions">
+                  <button class="primary" type="submit" data-t="applySnapshot">
+                    記録を適用</button
+                  ><button id="cancel-case" type="button" data-t="cancel">
+                    取り消す
+                  </button>
+                </div>
+              </form>
+              <div id="word-strip" class="word-strip"></div>
+            </div>
+            <div class="assertions">
+              <div class="assertions-head">
+                <h4 data-t="independent">独立した期待値</h4>
+                <span class="pill" data-t="manual">手入力・参照値</span>
+              </div>
+              <p class="field-hint" data-t="assertHint">
+                各フィールドの期待値と絶対許容差を保存します。空欄は未検証。NaN
+                / Infinity / -Infinity は許容差0のみ。
+              </p>
+              <div id="assertion-rows"></div>
+              <p class="field-hint" data-t="zeroHint">
+                float32は正負のゼロを区別します。非有限値は分類を照合し、NaNのペイロードはビット列で確認できます。
+              </p>
+            </div>
+          </div>
+        </section>
+        <section
+          class="panel"
+          id="panel-review"
+          role="tabpanel"
+          aria-labelledby="tab-review"
+          hidden
+        >
+          <div class="section-heading">
+            <div>
+              <h3 data-t="reviewHeading">持ち運べる検証記録</h3>
+              <p class="muted" data-t="reviewDescription">
+                JSONとPython検証器を同じフォルダに保存して、ブラウザなしで再実行。
+              </p>
+            </div>
+            <span id="review-verdict" class="pill"></span>
+          </div>
+          <div class="exports">
+            <button id="export-map">
+              <span>01 / CSV</span
+              ><strong data-t="exportMap">正規化マップ</strong
+              ><small data-t="exportMapSub">明示的な表記と解釈</small></button
+            ><button id="export-fixture">
+              <span>02 / JSON</span
+              ><strong data-t="exportFixture">回帰フィクスチャ</strong
+              ><small data-t="exportFixtureSub"
+                >生の記録 + 独立した期待値</small
+              ></button
+            ><button id="export-python">
+              <span>03 / PYTHON</span
+              ><strong data-t="exportPython">単体で動く検証器</strong
+              ><small data-t="exportPythonSub"
+                >標準ライブラリのみ</small
+              ></button
+            ><button id="export-report">
+              <span>04 / HTML</span
+              ><strong data-t="exportReport">印刷用レポート</strong
+              ><small data-t="exportReportSub">前提・重複・照合結果</small>
+            </button>
+          </div>
+          <div class="terminal">
+            <span data-t="command">保存したファイルと同じフォルダで実行</span
+            ><code>python3 verify.py regdeck-project.json</code
+            ><small data-t="exitCodes"
+              >終了コード: 0=全件一致 / 1=不一致・未完了 / 2=入力エラー</small
+            >
+          </div>
+          <div class="table-scroll">
+            <table class="results-table">
+              <thead>
+                <tr>
+                  <th data-t="caseField">記録 / フィールド</th>
+                  <th data-t="status">状態</th>
+                  <th data-t="rawBits">生の値 / ビット列</th>
+                  <th data-t="actual">計算結果</th>
+                  <th data-t="expectedTolerance">期待値 / 許容差</th>
+                </tr>
+              </thead>
+              <tbody id="review-rows"></tbody>
+            </table>
+          </div>
+          <p id="review-limit" class="field-hint"></p>
+          <p class="review-caveat" data-t="caveat">
+            全件一致は、登録された期待値との一致です。期待値の正しさ、未記録の状態、機器の適合性や安全性を保証するものではありません。
+          </p>
+        </section>
+      </section>
+      <section class="guide" id="guide">
+        <div>
+          <p class="eyebrow">WORKING NOTES</p>
+          <h2 data-t="guideTitle">迷いやすいところを、<br />明示的に。</h2>
+        </div>
+        <div class="guide-grid">
+          <article>
+            <span>01</span>
+            <h3 data-t="g1title">アドレスを推測しない</h3>
+            <p data-t="g1">
+              PDUは0–65535。1始まり表記は1を引きます。5桁参照はHolding
+              40001–49999 / Input 30001–39999のみ。記録の開始位置は常にPDUです。
+            </p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3 data-t="g2title">バイトを見える形に</h3>
+            <p data-t="g2">
+              標準のワード内は上位バイトが先。32ビットの組合せは機器の仕様で確認します。ABCD
+              / CDAB / BADC / DCBAを明示して、正規化したビット列を残します。
+            </p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3 data-t="g3title">期待値を固定する</h3>
+            <p data-t="g3">
+              期待値は手入力、または基準資料から。マップ編集で自動更新されません。サンプルは架空の参照データです。自分のプロジェクトはJSONで保存してください。
+            </p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3 data-t="g4title">境界を決めておく</h3>
+            <p data-t="g4">
+              256フィールド、64記録、各記録4096ワード、合計65536ワード、インポート2MiBまで。データの送信や自動保存はありません。読み込み後の計算はオフラインで動作します。
+            </p>
+          </article>
+        </div>
+      </section>
+      <footer>
+        <div class="brand">
+          RegDeck<span class="version">/ a decoding workbench</span>
+        </div>
+        <p data-t="footer">
+          仕様を確認する。独立して期待する。繰り返し確かめる。
+        </p>
+        <div>
+          <a
+            href="https://www.modbus.org/file/secure/modbusprotocolspecification.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Modbus specification ↗</a
+          ><a
+            href="https://docs.python.org/3/library/struct.html"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Python struct ↗</a
+          >
+        </div>
+      </footer>
+    </main>
+    <dialog id="import-dialog">
+      <div class="dialog-heading">
+        <h2 data-t="importTitle">プロジェクトを読み込む</h2>
+        <button id="close-import" aria-label="閉じる / Close">×</button>
+      </div>
+      <p data-t="importDescription">
+        JSONプロジェクト、または11列（またはPDU範囲付き13列）のマップCSVを読み込めます。CSVは現在の記録・期待値を保持します。エラー時は現在の作業を変更しません。
+      </p>
+      <label
+        ><span data-t="format">形式</span
+        ><select id="import-format">
+          <option value="json">Project JSON</option>
+          <option value="csv">Map CSV</option>
+        </select></label
+      ><label
+        ><span data-t="file">ファイル (最大2MiB)</span
+        ><input
+          id="import-file"
+          type="file"
+          accept=".json,.csv,application/json,text/csv" /></label
+      ><label
+        ><span data-t="paste">またはテキストを貼り付け</span
+        ><textarea
+          id="import-text"
+          rows="9"
+          spellcheck="false"
+          maxlength="2097152"
+        ></textarea>
+      </label>
+      <p id="import-error" role="alert"></p>
+      <div class="form-actions">
+        <button class="primary" id="apply-import" data-t="load">読み込む</button
+        ><button id="cancel-import" data-t="cancel">取り消す</button>
+      </div>
+    </dialog>
+    <script type="module" src="./app.mjs"></script>
+  </body>
+</html>
