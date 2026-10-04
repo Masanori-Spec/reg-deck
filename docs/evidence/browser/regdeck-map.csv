@@ -1,0 +1,6 @@
+id,label,space,address,convention,type,order,scale,offset,unit,note,pdu_start,pdu_end
+"temperature","Return temperature","holding","40001","reference","int16","AB","0.1","0","°C","Synthetic reference: signed FFE7 = −25; independently expected −2.5 °C.","0","0"
+"counter","Cycle counter","holding","2","pdu","uint32","ABCD","1","0","cycles","Synthetic reference: 0001 86A0 = 100000.","2","3"
+"counter_low","Counter · low-word alias","holding","4","one","uint16","AB","1","0","word","Intentional alias of the second counter word; retain overlap warning.","3","3"
+"flow","Flow reference","holding","4","pdu","float32","ABCD","1","0","L/min","Synthetic IEEE-754 reference: 4148 0000 = 12.5 exactly.","4","5"
+"status","Input status","input","30001","reference","uint16","AB","1","0","code","Separate input space; PDU 0 is not a collision with holding PDU 0.","0","0"

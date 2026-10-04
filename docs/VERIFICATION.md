@@ -1,6 +1,6 @@
 # Verification record
 
-Repaired review freeze: 2026-10-04. No remote publication or shared-browser use has been performed by this build task.
+Verified release evidence: 2026-10-04. The public repository is [Masanori-Spec/reg-deck](https://github.com/Masanori-Spec/reg-deck). Functional commit `70ecb0e45dc6a1e46ae63c522e4ea5880444a813` passed [run 37172852245](https://github.com/Masanori-Spec/reg-deck/actions/runs/37172852245). Subsequent documentation/evidence commits are checked separately; the embedded evidence below identifies the exact functional source that generated it.
 
 ## Executed locally
 
@@ -18,9 +18,9 @@ Repaired review freeze: 2026-10-04. No remote publication or shared-browser use 
 
 The Node and Python suites use synthetic data only. Randomized complete-project expectations are arbitrary independent numbers, not values copied from the decoder. Cross-implementation agreement does not prove an external map or human expectation is correct.
 
-## Authored, NOT executed at this freeze
+## Executed in hosted CI
 
-`tests/browser/browser-test.mjs` contains 15 sandboxed Chromium scenarios:
+All four Node 22/24 × Python 3.10/3.12 jobs passed the aggregate check, with the same engine counts listed above. `tests/browser/browser-test.mjs` passed all 15 sandboxed Chromium scenarios:
 
 1. Japanese/English, keyboard skip link and roving tabs
 2. Reference pass counts and visible intentional overlap
@@ -38,13 +38,13 @@ The Node and Python suites use synthetic data only. Randomized complete-project 
 14. Desktop screenshots, print PDF capture and reload behavior
 15. No external runtime requests or browser exceptions
 
-The runner uses `chromiumSandbox:true` and serves the app under `/reg-deck/` to exercise non-root deployment. The GitHub Actions definition targets Ubuntu22.04 and does not disable sandboxing or alter security settings. Its engine matrix covers Node22/24 and Python3.10/3.12. **No CI run is claimed yet.**
+The runner uses `chromiumSandbox:true` and serves the app under `/reg-deck/` to exercise non-root deployment. The GitHub Actions definition targets Ubuntu22.04 and does not disable sandboxing or alter security settings. Its engine matrix covers Node22/24 and Python3.10/3.12. The run succeeded with all five jobs. [Machine-readable evidence](evidence/hosted-ci.json) records the commit, jobs and artifact digest.
 
-Consequently: actual desktop/mobile rendering, focus behavior in a browser, downloaded-file behavior, print pagination, Safari/Firefox behavior and deployed-host behavior remain unverified. Authored browser assertions and screenshot code are not substitutes for executing them and inspecting the resulting pixels. The page renders the first200 review rows with an explicit truncation notice; machine/report exports contain all results.
+Actual EN/JA desktop rendering, the three Japanese mobile tabs, downloaded HTML, one-page UI print and two-page downloaded-report print were visually inspected. Downloaded JSON/CSV content and verifier bytes were checked; the actual downloaded Python file exits 0 for the passing fixture and 1 for the intentional mismatch. Screenshots and actual downloads are retained in [evidence/browser](evidence/browser/). Safari/Firefox, a full accessibility audit, deployed-public-host behavior and live devices remain unverified. Hosted tests serve the static build on loopback under `/reg-deck/`; this does not claim a public web deployment. The page renders the first 200 review rows with an explicit truncation notice; machine/report exports contain all results.
 
-## Review handoff
+## Interpretation limits
 
-Inspect the bounded numerical scope, strict validation and preserved-expectation contract first. Then run the designated sandboxed CI/browser route, inspect both locales on desktop and390px mobile, inspect print output, and verify the expected commit and static host only when publication is separately authorized. Re-run affected checks after any edits. Avoid presenting a matching fixture as device conformance, live measurement, safety approval, market validation or novelty.
+These are synthetic software checks. A matching fixture does not establish device conformance, live measurement, safe operation, market validation or novelty. The independently implemented Python verifier and differential comparisons do not replace a completed independent review. Re-run affected checks after edits and verify the exact remote commit before relying on a CI result.
 
 ## Received review findings and repairs
 
@@ -55,8 +55,14 @@ Four already-received functional findings were corrected, with regression tests:
 - Joined CSV header comparison could accept merged header cells. Import now requires exact header length and exact cells for either documented header variant
 - Build rewriting missed double-quoted parent-relative imports after formatting. Both quote styles are rewritten; emitted modules are checked against root and nested deployment URLs
 
-Independent review was interrupted and was not resumed. The received findings are repaired, but a full independent review is not claimed. Browser and visual checks remain unexecuted.
+Independent review was interrupted and was not resumed. The received findings are repaired, but a full independent review is not claimed. Subsequent ordinary release and functional checks do not complete or resume that independent review.
 
 ## Release preparation
 
 A clean `npm ci --ignore-scripts` initially failed because the optional fsevents lock entry lacked version metadata. The lockfile was regenerated from the official npm registry without changing the pinned Playwright 1.56.0 versions. Clean installation then passed. This is an ordinary release check and does not complete or resume the interrupted independent review.
+
+## Release fixes verified in CI
+
+- The mobile one-column grid previously inherited the wide table minimum. `minmax(0, 1fr)` now keeps tables inside their horizontal scrollers; all three 390px tabs pass the no-page-overflow assertion
+- Printed pages now have 12mm A4 margins and headings stay with their content. Print-specific type and cell spacing keep the reference exported report on two balanced pages
+- Actual CSV/HTML/JSON/Python downloads, screenshots and print PDFs are captured as CI evidence. The visual record documents which outputs were inspected

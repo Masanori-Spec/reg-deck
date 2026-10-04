@@ -1,0 +1,84 @@
+{
+  "project": "RegDeck",
+  "verifiedAt": "2026-10-04",
+  "functionalCommit": "70ecb0e45dc6a1e46ae63c522e4ea5880444a813",
+  "runId": 37172852245,
+  "runUrl": "https://github.com/Masanori-Spec/reg-deck/actions/runs/37172852245",
+  "jobs": [
+    {
+      "name": "browser",
+      "id": 111349206014,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "engine (24, 3.10)",
+      "id": 111349206057,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "engine (22, 3.12)",
+      "id": 111349206116,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "engine (24, 3.12)",
+      "id": 111349206146,
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "name": "engine (22, 3.10)",
+      "id": 111349206150,
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "engine": {
+    "nodeTests": 41,
+    "pythonTests": 39,
+    "decodeVectors": 2104,
+    "completeProjects": 1006,
+    "strictImportCases": 21,
+    "exportedCliCases": 4
+  },
+  "browser": {
+    "sandbox": true,
+    "passed": 15,
+    "failed": 0,
+    "runner": "ubuntu-22.04",
+    "deploymentSubpath": "/reg-deck/",
+    "desktopViewport": [
+      1440,
+      1050
+    ],
+    "mobileViewport": [
+      390,
+      844
+    ]
+  },
+  "artifact": {
+    "id": 11291907778,
+    "name": "regdeck-browser-evidence",
+    "sizeBytes": 1717578,
+    "sha256": "sha256:e03f7d18e582b0535f784151dd6247d45c7187bd279576f44de5b4d187a9d65b"
+  },
+  "independentReview": {
+    "status": "incomplete-interrupted",
+    "resumed": false
+  },
+  "visualInspection": {
+    "screenshots": 7,
+    "uiPrintPages": 1,
+    "downloadedReportPages": 2,
+    "allPagesInspected": true
+  },
+  "limits": [
+    "Synthetic fixtures only; expectations require independent validation",
+    "No device connectivity or conformance testing",
+    "No Safari, Firefox or full accessibility audit",
+    "Public source repository; separately deployed public application not claimed"
+  ]
+}

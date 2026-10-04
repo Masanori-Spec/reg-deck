@@ -1,0 +1,83 @@
+{
+  "status": "passed",
+  "sandbox": true,
+  "results": [
+    {
+      "name": "JA/EN, keyboard skip link and roving tabs",
+      "status": "passed"
+    },
+    {
+      "name": "Reference fixture shows five passing assertions and one alias",
+      "status": "passed"
+    },
+    {
+      "name": "Map drift preserves raw words and independent expectations; Undo restores",
+      "status": "passed"
+    },
+    {
+      "name": "Draft edits block export and navigation; cancellation and locale remain consistent",
+      "status": "passed"
+    },
+    {
+      "name": "Invalid map commit is atomic and byte order switches intentionally",
+      "status": "passed"
+    },
+    {
+      "name": "Expected values are entered and saved independently, blank is unasserted",
+      "status": "passed"
+    },
+    {
+      "name": "Snapshot missing words differ from zero; cancellation keeps saved assertions",
+      "status": "passed"
+    },
+    {
+      "name": "JSON import errors and hostile labels cannot mutate DOM or current project",
+      "status": "passed"
+    },
+    {
+      "name": "CSV map import retains expectations and validates normalized PDU columns",
+      "status": "passed"
+    },
+    {
+      "name": "Cancelled and superseded file reads never overwrite newer work",
+      "status": "passed"
+    },
+    {
+      "name": "Download failure remains visible and repeated export is deterministic",
+      "status": "passed"
+    },
+    {
+      "name": "Downloaded standalone Python executes pass and fail fixture",
+      "status": "passed"
+    },
+    {
+      "name": "Offline loaded workflow, mobile layout and long content stay bounded",
+      "status": "passed"
+    },
+    {
+      "name": "Print and reload clearly reset the session-only workspace",
+      "status": "passed"
+    },
+    {
+      "name": "No external runtime requests or browser exceptions",
+      "status": "passed"
+    }
+  ],
+  "errors": [],
+  "requests": [
+    "http://127.0.0.1:4173/reg-deck/",
+    "http://127.0.0.1:4173/reg-deck/styles.css",
+    "http://127.0.0.1:4173/reg-deck/app.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/core.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/example.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/export.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/verifier-source.mjs",
+    "http://127.0.0.1:4173/reg-deck/",
+    "http://127.0.0.1:4173/reg-deck/styles.css",
+    "http://127.0.0.1:4173/reg-deck/app.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/core.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/example.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/export.mjs",
+    "http://127.0.0.1:4173/reg-deck/src/verifier-source.mjs"
+  ]
+}

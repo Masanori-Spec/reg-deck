@@ -6,6 +6,8 @@ RegDeck is a local-only Modbus map-to-regression-fixture workbench. It joins a r
 
 Its central promise is deliberately small: **editing the map never regenerates expectations**. An address-base or byte-order change must face the same recorded words and reference values.
 
+![RegDeck Japanese desktop interface with register map and independent expectations](docs/evidence/browser/desktop-map-ja.png)
+
 ## Quick start
 
 Node.js 22+ is needed only for the local development server and tests. Python 3.10+ runs the exported verifier without third-party packages.
@@ -74,7 +76,7 @@ npm run test:browser   # after serving dist and installing Playwright Chromium
 
 At the repaired review freeze, 41 Node tests and 39 Python tests passed, together with 2,104 differential decode vectors, 1,006 complete projects, 21 strict-import parity cases and four exported-verifier CLI cases. The generated verifier bytes match the tested standalone source. See [docs/VERIFICATION.md](docs/VERIFICATION.md) for current counts and execution limits.
 
-The sandboxed Chromium workflow is authored for Ubuntu 22.04. **Browser automation, screenshots, mobile/print visual inspection and hosted behavior have not yet been executed at the initial freeze.** This is not a claim of visual QA completion or CI success. No browser security setting is bypassed by the test runner.
+[Hosted functional CI](https://github.com/Masanori-Spec/reg-deck/actions/runs/37172852245) passed all four Node 22/24 × Python 3.10/3.12 jobs and **15 sandboxed Chromium scenarios**. Actual desktop, 390px mobile, downloaded-report and print output were inspected. The example report prints on two A4 pages. See [visual evidence](docs/VISUAL_REVIEW.md). The independent review was interrupted and remains incomplete; this release does not claim a completed independent audit. No live-device or separately deployed public-app validation is claimed.
 
 ## Why this project
 
