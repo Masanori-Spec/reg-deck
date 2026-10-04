@@ -1,0 +1,61 @@
+name: Verify RegDeck
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  engine:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        node: [22, 24]
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: engine-node${{ matrix.node }}-python${{ matrix.python }}
+          path: tests/artifacts/
+  browser:
+    # Ubuntu 22.04 is the compatibility baseline. Revalidate sandbox support on runner upgrades.
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Verify UI with sandboxed Chromium under a deployment subpath
+        env:
+          BASE_PATH: /reg-deck/
+          BASE_URL: http://127.0.0.1:4173/reg-deck/
+        run: |
+          npm run serve > /tmp/regdeck-server.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://127.0.0.1:4173/reg-deck/ > /dev/null && break; sleep 1; done
+          npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: regdeck-browser-evidence
+          path: tests/browser/artifacts/
