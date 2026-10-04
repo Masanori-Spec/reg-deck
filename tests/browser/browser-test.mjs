@@ -419,6 +419,8 @@ try {
       assert.equal(verifier.text, await readFile("python/verify.py", "utf8"));
       await writeFile(`${dir}/verify.py`, verifier.text);
       await writeFile(`${dir}/regdeck-project.json`, fixture.text);
+      await writeFile(`${dir}/regdeck-map.csv`, (await download("#export-map")).text);
+      await writeFile(`${dir}/regdeck-report.html`, (await download("#export-report")).text);
       let run = spawnSync(
         "python3",
         [`${dir}/verify.py`, `${dir}/regdeck-project.json`],
@@ -499,6 +501,11 @@ try {
         printBackground: true,
       });
       await page.emulateMedia({ media: "screen" });
+      const reportPage = await context.newPage();
+      await reportPage.setContent(await readFile(`${dir}/regdeck-report.html`, "utf8"));
+      await reportPage.screenshot({ path: `${dir}/downloaded-report.png`, fullPage: true });
+      await reportPage.pdf({ path: `${dir}/downloaded-report.pdf`, format: "A4", printBackground: true });
+      await reportPage.close();
       await page.locator("#load-drift").click();
       await page.reload();
       assert.equal(
